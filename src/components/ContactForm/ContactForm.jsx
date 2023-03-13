@@ -1,10 +1,10 @@
 import { Formik, ErrorMessage } from 'formik';
-import * as yup from 'yup';
+import * as Yup from 'yup';
 import 'yup-phone';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from 'redux/operations';
-import { selectContacts } from 'redux/selectors';
+import { addContact } from 'redux/contacts/operations';
+import { selectContacts } from 'redux/contacts/selectors';
 
 import {
   ContactForm,
@@ -12,26 +12,23 @@ import {
   InputError,
   FormInput,
   FormLabel,
-} from './FormContact.styled.js';
+} from './ContactForm.styled';
 
-const schema = yup.object().shape({
-  name: yup
-    .string()
-    .min(2, 'Your name is too short')
-    .required('Please enter full name'),
-  phone: yup.string().required('Please enter number').phone('UA', true),
+const validationSchema = Yup.object({
+  name: Yup.string().required('This field is required'),
+  number: Yup.string().required('This field is required'),
 });
 
 const initialValues = {
   name: '',
-  phone: '',
+  number: '',
 };
 
 const FormContacts = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectContacts);
   const handleSubmit = (values, { resetForm }) => {
-    const { name, phone } = values;
+    const { name, number } = values;
 
     const names = contacts.find(
       contact => contact.name.toLowerCase() === name.toLowerCase()
@@ -41,14 +38,14 @@ const FormContacts = () => {
       return;
     }
 
-    dispatch(addContact({ name: name, phone: phone }));
+    dispatch(addContact({ name: name, number: number }));
     resetForm();
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={schema}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
       <ContactForm autoComplete="off">
@@ -63,9 +60,9 @@ const FormContacts = () => {
           <FormInput
             placeholder="Phone number: +380..."
             type="tel"
-            name="phone"
+            name="number"
           />
-          <ErrorMessage name="phone" component={InputError} />
+          <ErrorMessage name="number" component={InputError} />
         </FormLabel>
         <ButtonAdd type="submit">Submit</ButtonAdd>
       </ContactForm>
